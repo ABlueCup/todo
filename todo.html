@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>to do list</title>
+    <style>
+        #app {
+            width: 500px;
+            margin: 20px auto;
+            box-shadow: 0 0 1px 2px #ccc;
+        }
+
+        #app h3 {
+            text-align: center;
+            height: 32px;
+            line-height: 32px;
+        }
+
+        #app>div {
+            border-top: 1px solid #ccc;
+        }
+
+        .body div {
+            height: 30px;
+            line-height: 30px;
+            padding: 0 0 0 10px;
+        }
+
+        .body span {
+            margin-left: 6px;
+        }
+
+        .body .del {
+            float: right;
+            margin-right: 10px;
+            color: yellowgreen;
+            cursor: pointer;
+            font-weight: bolder;
+            font-size: 24px;
+        }
+
+        .body .del:hover {
+            color: greenyellow
+        }
+
+        .body .del:active {
+            color: orange
+        }
+
+        .body .del:visited {
+            color: orangered;
+        }
+
+        .footer {
+            height: 40px;
+        }
+
+        .footer button {
+            height: 40px;
+            outline: none;
+            padding: 0 10px;
+            margin: 0;
+            border: 0;
+            border-right: 0px solid gray;
+        }
+
+        .footer button:active {
+            background-color: #999;
+        }
+
+        #app .body .addTask {
+            margin: 10px;
+            height: 50px;
+            border: 0px solid gray;
+        }
+
+        .addTask input {
+            height: 30px;
+        }
+        .addTask button{
+            margin:0;
+            padding:1px 4px;
+            border: 1px;
+            height: 30px;
+        }
+    </style>
+</head>
+
+<body>
+    <section id="app">
+        <h3 class="title">{{title}}</h3>
+        <div class="body">
+            <div v-for="(item,index) in list">
+                <input type="checkbox" v-model="item.isDone">
+                <span>{{item.name}}</span>
+                <span class="del" @click="del(index)">&bigotimes;</span>
+            </div>
+            <div class="addTask" v-show="addTaskShow">
+                <input type="text" placeholder="任务名称" v-model="newTask">
+                <button @click="addTask">添加</button>
+            </div>
+        </div>
+        <div class="footer">
+            <button @click="showAll">总任务</button>
+            <button @click="notDone">未完成任务</button>
+            <button @click="done">已完成任务</button>
+            <button @click="showAddTask">添加任务</button>
+        </div>
+    </section>
+    <script src="./vue.min.js"></script>
+    <script>
+        let vm = new Vue({
+            el: '#app',
+            data: {
+                title: '任务列表',
+                addTaskShow: false,
+                task: [
+                    { name: "吃饭", 'isDone': true },
+                    { name: "睡觉", 'isDone': false },
+                    { name: "打豆豆", 'isDone': false }
+                ],
+                list: [
+                    { name: "吃饭", 'isDone': true },
+                    { name: "睡觉", 'isDone': false },
+                    { name: "打豆豆", 'isDone': false }
+                ],
+                newTask: null
+            },
+            methods: {
+                showAll() {
+                    this.list = this.task.map(item=>{
+                        return item;
+                    })
+                },
+                notDone() {
+                    this.list = this.task.filter(item => {
+                        if (!item.isDone) {
+                            return item;
+                        }
+                    })
+                },
+                done() {
+                    this.list = this.task.filter(item => {
+                        if (item.isDone) {
+                            return item;
+                        }
+                    })
+                },
+                showAddTask() {
+                    this.addTaskShow = true;
+                },
+                addTask() {
+                    if (this.newTask) {
+                        this.task.push({ name: this.newTask, isDone: false });
+                        this.newTask = null;
+                        this.addTaskShow = false;
+                        this.showAll();
+                    }
+                },
+                del(index) {
+                    this.task.splice(index, 1);
+                    this.showAll();
+                }
+            }
+        });
+    </script>
+</body>
+
+</html>
