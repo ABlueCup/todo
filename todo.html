@@ -22,7 +22,7 @@
             border-top: 1px solid #ccc;
         }
 
-        .body div {
+        .body div div {
             height: 30px;
             line-height: 30px;
             padding: 0 0 0 10px;
@@ -79,9 +79,10 @@
         .addTask input {
             height: 30px;
         }
-        .addTask button{
-            margin:0;
-            padding:1px 4px;
+
+        .addTask button {
+            margin: 0;
+            padding: 1px 4px;
             border: 1px;
             height: 30px;
         }
@@ -92,76 +93,84 @@
     <section id="app">
         <h3 class="title">{{title}}</h3>
         <div class="body">
-            <div v-for="(item,index) in list">
-                <input type="checkbox" v-model="item.isDone">
-                <span>{{item.name}}</span>
-                <span class="del" @click="del(index)">&bigotimes;</span>
+            <div v-if="taskType===0">
+                <div v-for="(item, index) in allTasks">
+                    <input type="checkbox" v-model="item.isDone">
+                    <span>{{item.task}}</span>
+                    <span class="del" @click="del(index)">&bigotimes;</span>
+                </div>
             </div>
+            <div v-if="taskType===1">
+                <div v-for="(item, index) in undoneTasks">
+                    <input type="checkbox" v-model="item.isDone">
+                    <span>{{item.task}}</span>
+                    <span class="del" @click="del(index)">&bigotimes;</span>
+                </div>
+            </div>
+            <div v-if="taskType===2">
+                <div v-for="(item, index) in doneTasks">
+                    <input type="checkbox" v-model="item.isDone">
+                    <span>{{item.task}}</span>
+                    <span class="del" @click="del(index)">&bigotimes;</span>
+                </div>
+            </div>
+
             <div class="addTask" v-show="addTaskShow">
                 <input type="text" placeholder="任务名称" v-model="newTask">
                 <button @click="addTask">添加</button>
             </div>
         </div>
         <div class="footer">
-            <button @click="showAll">总任务</button>
-            <button @click="notDone">未完成任务</button>
-            <button @click="done">已完成任务</button>
-            <button @click="showAddTask">添加任务</button>
+            <button @click="taskType = 0">总任务</button>
+            <button @click="taskType = 1">未完成任务</button>
+            <button @click="taskType = 2">已完成任务</button>
+            <button @click="addTaskShow = true">添加任务</button>
         </div>
     </section>
-    <script src="./vue.min.js"></script>
+    <script src="./vue/dist/vue.js"></script>
     <script>
         let vm = new Vue({
             el: '#app',
             data: {
                 title: '任务列表',
+                taskType: 0,
                 addTaskShow: false,
-                task: [
-                    { name: "吃饭", 'isDone': true },
-                    { name: "睡觉", 'isDone': false },
-                    { name: "打豆豆", 'isDone': false }
-                ],
-                list: [
-                    { name: "吃饭", 'isDone': true },
-                    { name: "睡觉", 'isDone': false },
-                    { name: "打豆豆", 'isDone': false }
+                tasks: [
+                    { id: 0, task: "吃饭", isDone: false },
+                    { id: 1, task: "睡觉", isDone: false },
+                    { id: 2, task: "打豆豆", isDone: false }
                 ],
                 newTask: null
             },
+            computed: {
+                allTasks() {
+                    return this.tasks;
+                },
+                undoneTasks() {
+                    return this.tasks.filter(item => {
+                        return !item.isDone ? item : null;
+                    })
+                },
+                doneTasks() {
+                    return this.tasks.filter(item => {
+                        return item.isDone ? item : null;
+                    })
+                }
+            },
             methods: {
-                showAll() {
-                    this.list = this.task.map(item=>{
-                        return item;
-                    })
-                },
-                notDone() {
-                    this.list = this.task.filter(item => {
-                        if (!item.isDone) {
-                            return item;
-                        }
-                    })
-                },
-                done() {
-                    this.list = this.task.filter(item => {
-                        if (item.isDone) {
-                            return item;
-                        }
-                    })
-                },
-                showAddTask() {
-                    this.addTaskShow = true;
-                },
+                // 添加任务
                 addTask() {
                     if (this.newTask) {
-                        this.task.push({ name: this.newTask, isDone: false });
+                        this.tasks.push({id:this.tasks.length, task: this.newTask, isDone: false });
                         this.newTask = null;
                         this.addTaskShow = false;
-                        this.showAll();
+                        this.taskType = 0;
                     }
                 },
+                // 删除某个任务
                 del(index) {
-                    this.task.splice(index, 1);
-                    this.showAll();
+                    this.tasks.splice(index, 1);
+                    this.taskType = 0;
                 }
             }
         });
